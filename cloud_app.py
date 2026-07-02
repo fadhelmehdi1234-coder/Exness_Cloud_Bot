@@ -4,7 +4,7 @@ import requests
 app = Flask(__name__)
 
 # --- Bot Configuration ---
-TELEGRAM_TOKEN = "8904786325:AAHIiEsEuDP1CrdbMKdZD_U0xMmqkRS2Bas"
+TELEGRAM_TOKEN = "8904786325:AAGi9BEdKX7r4g1BAuwoyrKPlChwhlMQpTA"
 TELEGRAM_CHAT_ID = "8709813670"
 
 def send_telegram_alert(message):
