@@ -1,42 +1,46 @@
-# -*- coding: utf-8 -*-
-# تفعيل السيرفر الجبار 2026
-from flask import Flask, request, jsonify
-import telebot
+import os
+import sys
 
-BOT_TOKEN = "8904786325:AAGi9BEdKX7r4g1BAuwoyrKPlChwhlMQpTA"
-ALLOWED_CHAT_ID = 8709813670
+# تفعيل التثبيت التلقائي للمكتبات الناقصة في السيرفر فوراً
+try:
+    import telebot
+except ImportError:
+    os.system(f"{sys.executable} -m pip install pyTelegramBotAPI")
+    import telebot
 
-bot = telebot.TeleBot(BOT_TOKEN)
+try:
+    from flask import Flask
+except ImportError:
+    os.system(f"{sys.executable} -m pip install flask")
+    from flask import Flask
+
+# إعداد السيرفر والويب هوك للبقاء حياً 24/7
 app = Flask(__name__)
-
-RISK_SETTINGS = {
-    "demo_days": 21,
-    "start_balance": 100.0,
-}
 
 @app.route('/')
 def home():
-    return "🚀 Exness Bot Server is Active!"
+    return "🟢 Exness Cloud Bot is Running Live!"
 
-@app.route('/telegram-webhook', methods=['POST'])
-def telegram_webhook():
-    if request.headers.get('content-type') == 'application/json':
-        json_string = request.get_data().decode('utf-8')
-        update = telebot.types.Update.de_json(json_string)
-        bot.process_new_updates([update])
-        return ''
-    else:
-        return jsonify({"status": "error"}), 403
+# ضع هنا توكن البوت الخاص بك (تأكد من وضعه بين علامتي التنصيص)
+BOT_TOKEN = "ضع_التوكن_الخاص_بك_هنا"
+bot = telebot.TeleBot(BOT_TOKEN)
+
+# الأوامر الأساسية للبوت
+@bot.message_handler(commands=['start', 'help'])
+def send_welcome(message):
+    bot.reply_to(message, "🦅 أهلاً بك في بوت إكسنس السحابي! أنا أعمل الآن من السحاب 24/7 بدون انقطاع! 🚀")
 
 @bot.message_handler(commands=['status'])
 def send_status(message):
-    if message.chat.id != ALLOWED_CHAT_ID: return
     bot.reply_to(message, "🟢 السيرفر شغال في السحاب ومستعد 100% يا مهندس!")
 
-@bot.message_handler(commands=['balance'])
-def send_balance(message):
-    if message.chat.id != ALLOWED_CHAT_ID: return
-    bot.reply_to(message, f"💰 الرصيد الحالي: ${RISK_SETTINGS['start_balance']} USD")
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+# تشغيل البوت بأمان
+if __name__ == "__main__":
+    print("🚀 Starting Bot...")
+    # تشغيل البوت في الخلفية بدون حجز السيرفر بالكامل لضمان عمل الـ Web
+    import threading
+    threading.Thread(target=bot.infinity_polling, daemon=True).start()
+    
+    # تشغيل Flask على البورت الذي يطلبه Render
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
